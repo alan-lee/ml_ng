@@ -63,16 +63,43 @@ Theta2_grad = zeros(size(Theta2));
 %
 
 
-A_1 = X;
+A1 = X;
 
-A_2 = sigmoid([ones(m, 1) A_1] * Theta1');
+A2 = sigmoid([ones(m, 1) A1] * Theta1');
 
-A_3 = sigmoid([ones(m, 1) A_2] * Theta2');
+A3 = sigmoid([ones(m, 1) A2] * Theta2');
 
+Thate_All = [Theta1(:, 2:end)(:); Theta2(:, 2:end)(:)];
 
+Y = zeros(size(A3));
 
+for i = 1 : num_labels
+  h = A3(:, i);
+  yvec = (y == i);
+  Y(:, i) = yvec;
+  J = J +  ((-yvec') * log(h) - (1- yvec') * log(1 - h)) / m;
+end
 
+J = J + lambda * (Thate_All' * Thate_All) / (2 * m);
 
+Theta1_Zero = [zeros(hidden_layer_size, 1) Theta1(:, 2:end)];
+Theta2_Zero = [zeros(num_labels, 1) Theta2(:, 2:end)];
+
+for i = 1 : m
+  a3 = ([A3(i, :)])';
+  a2 = ([1 A2(i, :)])';
+  a1 = ([1 A1(i, :)])';
+  
+  Delta3 = a3 - (Y(i, :))';
+  Delta2 = Theta2' * Delta3 .* a2 .* (1 - a2);
+  Delta2 = Delta2(2:end);
+  
+  Theta2_grad = Theta2_grad + Delta3 * a2';
+  Theta1_grad = Theta1_grad + Delta2 * a1';
+end
+
+Theta2_grad = Theta2_grad ./ m + lambda * Theta2_Zero;
+Theta1_grad = Theta1_grad ./ m + lambda * Theta1_Zero;
 
 
 

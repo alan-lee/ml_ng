@@ -89,17 +89,17 @@ for i = 1 : m
   a3 = ([A3(i, :)])';
   a2 = ([1 A2(i, :)])';
   a1 = ([1 A1(i, :)])';
-  
+
   Delta3 = a3 - (Y(i, :))';
   Delta2 = Theta2' * Delta3 .* a2 .* (1 - a2);
   Delta2 = Delta2(2:end);
-  
+
   Theta2_grad = Theta2_grad + Delta3 * a2';
   Theta1_grad = Theta1_grad + Delta2 * a1';
 end
 
-Theta2_grad = Theta2_grad ./ m + lambda * Theta2_Zero;
-Theta1_grad = Theta1_grad ./ m + lambda * Theta1_Zero;
+Theta2_grad = (Theta2_grad + lambda * Theta2_Zero) / m;
+Theta1_grad = (Theta1_grad + lambda * Theta1_Zero) / m;
 
 
 
